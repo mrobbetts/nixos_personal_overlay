@@ -1,0 +1,13 @@
+diff --git a/libs/config.js b/libs/config.js
+index c9c226c6..ea530a82 100644
+--- a/libs/config.js
++++ b/libs/config.js
+@@ -6,6 +6,8 @@ module.exports = function(s){
+         config : configLocation && configLocation.endsWith('.json') ? configLocation : s.mainDirectory+'/conf.json',
+         languages : s.mainDirectory+'/languages'
+     }
++    console.log('Using config file:' + s.location.config)
++    console.log('Using superusers file:' + s.location.super)
+     try{
+         var config = require(s.location.config)
+     }catch(err){
