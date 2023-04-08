@@ -1,0 +1,70 @@
+{ lib
+, stdenv
+, fetchFromGitHub
+, pkgs
+, openssh
+, ffmpeg
+, nodejs
+, nodePackages }:
+
+let
+  nodeDeps = (import ./node-composition.nix {
+    inherit pkgs nodejs;
+    inherit (stdenv.hostPlatform) system;
+  }).nodeDependencies.override (old: {
+    src = src;
+    #dontNpmInstall = true;
+  });
+
+  src = fetchFromGitHub {
+    owner = "khowling";
+    repo = "open-source-nvr";
+    rev = "1f92c75a8e35304c895ed2cead511a2506f058cd";
+    sha256 = "sha256-qktpxMQ9rNX/nvKZBDfqk7PO1uayrzJ5XpgbJ5j0atM=";
+  };
+in
+
+stdenv.mkDerivation rec {
+  pname = "open-source-nvr";
+  version = "0.9";
+
+  inherit src;
+
+  buildInputs = [
+    openssh
+  ];
+
+  nativeBuildInputs = [
+    nodejs
+    ffmpeg
+    openssh
+  ];
+
+  buildPhase = ''
+    runHook preBuild
+
+    ln -sf ${nodeDeps}/lib/node_modules ./
+
+    export PATH="${nodeDeps}/bin:$PATH"
+
+    #npm config set cache ./tmp --global
+    npm run-script build
+
+    echo "Done"
+
+    runHook postBuild
+  '';
+
+  installPhase = ''
+      runHook preInstall
+
+      # WIPWIPWIP
+      mkdir -p $out/share
+      cp -ra . $out/share/${pname}
+      #echo '${nodeDeps}'
+      ln -s ${nodeDeps}/lib/node_modules $out/share/${pname}/node_modules
+
+      runHook postInstall
+    '';
+
+}

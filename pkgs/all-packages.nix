@@ -7,4 +7,5 @@ with pkgs;
 {
   mdnsreflector = callPackage ./mdnsreflector {};
   shinobi       = callPackage ./shinobi {};
+  open-source-nvr = callPackage ./open-source-nvr {};
 }
